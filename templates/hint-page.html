@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head>
+    <title>Scavenger Hunt</title>
+</head>
+<style>
+    .dot {
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+</style>
+<body>
+    <div style="text-align: center;">
+        {% for i in range(totalHints) %}
+            {% if i < foundHints %}
+                <span class="dot" style="background-color: green"></span>
+            {% else %}
+                <span class="dot" style="background-color: gray"></span>
+            {% endif %}
+        {% endfor %}
+
+        <h1>{{ hint }}</h1>
+    </div>
+</body>
+</html>

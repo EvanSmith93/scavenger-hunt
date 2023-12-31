@@ -1,0 +1,9 @@
+# Environment variables
+backend/.env
+
+# Node modules
+node_modules
+*/node_modules
+
+# DS_Store files
+**/.DS_Store

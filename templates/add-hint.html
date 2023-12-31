@@ -1,0 +1,21 @@
+<--<!doctype html>
+<html>
+<head>
+    <title>Scavenger Hunt</title>
+    <style>
+    </style>
+</head>
+<body>
+    <form action="{{ url_for('addHint') }}" method="post">
+        <div>
+            <p>Game</p>
+            <input type="text" name="gameSubmit">
+        </div>
+        <div>
+            <p>Hint</p>
+            <input type="text" name="hintSubmit">
+        </div>
+        <input type="submit">
+    </form>
+</body>
+</html>--!>
