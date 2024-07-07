@@ -11,7 +11,7 @@ const HintPage = () => {
   useEffect(() => {
     const fetchHint = async () => {
       const res = await ServerFacade.getHint(id);
-      
+      console.log(res);
       if (res.ok) {
         setData(res.body);
       } else {

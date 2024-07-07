@@ -8,12 +8,10 @@ const GameCard = ({ game }) => {
     const [newHint, setNewHint] = useState('');
 
     const addHint = async (gameId) => {
-        const id = parseInt(Math.random().toFixed(8).slice(2));
-        const newHintJson = { id: id, hint: newHint, gameId: gameId };
-        console.log(newHintJson);
-        
+        const newHintJson = { hint: newHint, gameId: gameId };
         const res = await ServerFacade.addHint(newHintJson);
-        setHints(prevHints => [...prevHints, newHint + ' -- ' + id]);
+        console.log(res);
+        setHints((prevHints) => [...prevHints, newHint + " -- " + res.body]);
 
         setNewHint('');
     };

@@ -1,6 +1,6 @@
 // a sample server facade
 
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = 'http://localhost:3001';
 
 class ServerFacade {
 static async addHint(hint) {

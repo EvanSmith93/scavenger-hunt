@@ -1,13 +1,15 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
-const mysql = require('mysql2');
+// const mysql = require('mysql2');
+const sqlite3 = require('sqlite3').verbose();
 var bodyParser = require('body-parser')
 const dotenv = require('dotenv');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 const corsOptions = {
-  origin: '*'
+    origin: '*'
 }
 
 app.use(cors(corsOptions));
@@ -16,89 +18,103 @@ app.use(bodyParser.json());
 dotenv.config();
 
 // AWS RDS MySQL connection details
-const dbConfig = {
-  host: process.env.HOST,
-  user: process.env.USERNAME,
-  password: process.env.PASSWORD,
-  database: 'scavenger_hunt',
-};
-
-console.log(dbConfig);
+// const dbConfig = {
+//   host: process.env.HOST,
+//   user: process.env.USERNAME,
+//   password: process.env.PASSWORD,
+//   database: 'scavenger_hunt',
+// };
 
 // Create a pool to handle database connections
-const pool = mysql.createPool(dbConfig);
+// const pool = mysql.createPool(dbConfig);
+
+const dbPath = '../database/scavenger_hunt.db';
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        return console.error(err.message);
+    }
+    console.log('Connected to the in-memory SQlite database.');
+});
 
 // Insert hint into the database
 app.post('/add-hint', (req, res) => {
-    pool.query('INSERT INTO hints (id, hint, gameid) VALUES (?, ?, ?)', [req.body.id, req.body.hint, req.body.gameId], (err, results) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send({ok: false, body: err});
-        } else {
-            res.json({ok: true, body: results.insertId});
-        }
+    db.serialize(() => {
+        db.run('INSERT INTO hint (hint, gameid) VALUES (?, ?)', [req.body.hint, req.body.gameId], function (err) {
+            if (err) {
+                console.error(err.message);
+                return res.status(500).send({ ok: false, body: err.message });
+            }
+
+            // Fetch the last inserted ID
+            db.get('SELECT id FROM hint WHERE rowid = last_insert_rowid()', (err, row) => {
+                if (err) {
+                    console.error(err.message);
+                    return res.status(500).send({ ok: false, body: err.message });
+                }
+                res.json({ ok: true, body: row.id });
+            });
+        });
     });
 });
 
 // Retrieve a hint by ID from the database
 app.get('/get-hint/:id', (req, res) => {
     console.log('getting one hint: ' + req.params.id)
-    pool.query('SELECT * FROM hints WHERE id = ?', [req.params.id], (err, results) => {
-        if (err) {
-            res.status(500).send({ok: false, body: err});
+    db.get('SELECT * FROM hint WHERE id = ?', [req.params.id], (err, row) => {
+        if (err || row === undefined) {
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
         } else {
-            console.log(results);
-            if (results.length > 0) {
-                res.json({ok: true, body: results[0]});
-            } else {
-                res.status(404).send({ok: false, body: 'Hint not found'});
-            }
+            res.json({ ok: true, body: row })
         }
     });
 });
 
 // Retrieve all hints from the database
 app.get('/get-all-hints', (req, res) => {
-    // pool.query('SELECT * FROM hints', (err, results) => {
-    //     if (err) {
-    //         res.status(500).send({ok: false, body: err});
-    //     } else {
-    //         res.json({ok: true, body: results});
-    //     }
-    // });
+    db.all('SELECT * FROM hint', (err, rows) => {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send({ok: false, body: err});
+        } else {
+            res.json({ok: true, body: rows});
+        }
+    });
 });
 
 // Retrieve all hints for a specific game
 app.get('/get-hints-for-game/:gameId', (req, res) => {
-    pool.query('SELECT * FROM hints WHERE gameid = ?', [req.params.gameId], (err, results) => {
+    db.all('SELECT * FROM hint WHERE gameId = ?', [req.params.gameId], (err, rows) => {
         if (err) {
-            res.status(500).send({ok: false, body: err});
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
         } else {
-            res.json({ok: true, body: results});
+            res.json({ ok: true, body: rows });
         }
     });
 });
 
 // Insert game into the database
 app.post('/add-game', (req, res) => {
-    pool.query('INSERT INTO games (name) VALUES (?)', [req.body.name], (err, results) => {
+    console.log('adding game: ' + req.body.name)
+    db.run('INSERT INTO game (name) VALUES (?)', [req.body.name], function(err) {
         if (err) {
-            res.status(500).send({ok: false, body: err});
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
         } else {
-            console.log(results);
-            res.send({ok: true, id: results.insertId});
+            res.send({ ok: true, id: this.lastID });
         }
     });
 });
 
 // Retrieve all games from the database
 app.get('/get-all-games', (req, res) => {
-    pool.query('SELECT * FROM games', (err, results) => {
+    db.all('SELECT * FROM game', (err, rows) => {
         if (err) {
-            res.status(500).send({ok: false, body: err});
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
         } else {
-            // send back the results with an ok status
-            res.status(200).send({ok: true, body: results});
+            res.status(200).send({ ok: true, body: rows });
         }
     });
 });
