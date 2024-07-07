@@ -6,3 +6,6 @@ backend/.env
 
 # DS_Store files
 **/.DS_Store
+
+# Database
+database/scavenger_hunt.db
