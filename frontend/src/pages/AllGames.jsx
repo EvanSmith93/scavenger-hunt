@@ -1,29 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import ServerFacade from '../serverFacade/ServerFacade';
-import GameCard from './GameCard';
-
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import ServerFacade from "../serverFacade/ServerFacade";
+import GameCard from "./GameCard";
+import { Button, Flex, Form, Input, Layout, Space, Typography } from "antd";
 
 const AllGames = () => {
     const [games, setGames] = useState([]);
     const [error, setError] = useState(false);
 
-    const [newName, setNewName] = useState('');
+    const [form] = Form.useForm();
 
-    const addGame = async (name) => {
-        const newGameJson = {name: name};
+    async function addGame(values) {
+        const newGameJson = { name: values.name };
 
         const response = await ServerFacade.addGame(newGameJson);
-        setGames(prevGames => [...prevGames, {name: name, id: response.id}]);
-        
-        setNewName('');
-    };
+        setGames((prevGames) => [
+            ...prevGames,
+            { name: values.name, id: response.id },
+        ]);
+
+        form.resetFields();
+    }
 
     useEffect(() => {
         const fetchGames = async () => {
             const res = await ServerFacade.getAllGames();
-            
+
             if (res.ok) {
                 setGames(res.body);
             } else {
@@ -33,19 +35,41 @@ const AllGames = () => {
         fetchGames();
     }, []);
 
-    return ( 
-        <div className="all-games">
-            <h1>All Games</h1>
+    return (
+        <Space direction="vertical" size="middle" style={{ padding: "20px" }}>
+            <Typography.Title>All Games</Typography.Title>
+
             {error && <div>Error</div>}
             {!error && !games && <div>Loading...</div>}
-            {!error && games && (
-                games.map((game, index) => (
-                    <GameCard game={game} key={index} />
-                ))
-            )}
 
-            <div className="mt-3">
-            <input
+            <Flex wrap gap="middle">
+                {!error &&
+                    games &&
+                    games.map((game, index) => (
+                        <GameCard game={game} key={index} />
+                    ))}
+            </Flex>
+
+            <Form form={form} onFinish={addGame}>
+                <Form.Item
+                    name="name"
+                    label="Name"
+                    rules={[{ required: true }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        className="float-right"
+                        onClick={form.submit}
+                    >
+                        Add Game
+                    </Button>
+                </Form.Item>
+            </Form>
+
+            {/* <input
                 type="text"
                 className="form-control w-25 mx-auto"
                 placeholder="Enter game name"
@@ -58,8 +82,7 @@ const AllGames = () => {
                 disabled={!newName}
             >
                 Add Game
-            </button>
-            </div>
+            </button> */}
 
             {/* <div className="container mt-5">
                 <h2>Add Game</h2>
@@ -71,8 +94,8 @@ const AllGames = () => {
                     <button type="submit" className="btn btn-primary">Add Game</button>
                 </form>
             </div> */}
-        </div>
-     );
-}
- 
+        </Space>
+    );
+};
+
 export default AllGames;

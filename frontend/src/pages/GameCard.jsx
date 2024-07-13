@@ -1,72 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import ServerFacade from '../serverFacade/ServerFacade';
+import React, { useState, useEffect } from "react";
+import ServerFacade from "../serverFacade/ServerFacade";
+import { Button, Card, Form, Input, List, Typography } from "antd";
+import { useForm } from "antd/es/form/Form";
+import { Link } from "react-router-dom";
 
 const GameCard = ({ game }) => {
     const [hints, setHints] = useState([]);
     const [error, setError] = useState(false);
 
-    const [newHint, setNewHint] = useState('');
+    const [form] = useForm();
 
-    const addHint = async (gameId) => {
-        const newHintJson = { hint: newHint, gameId: gameId };
+    async function addHint(values) {
+        const newHintJson = { hint: values.hint, gameId: game.id };
         const res = await ServerFacade.addHint(newHintJson);
-        console.log(res);
-        setHints((prevHints) => [...prevHints, newHint + " -- " + res.body]);
+        setHints((prevHints) => [
+            ...prevHints,
+            { hint: values.hint, id: res.id },
+        ]);
 
-        setNewHint('');
-    };
+        form.resetFields();
+    }
 
     useEffect(() => {
         const fetchHints = async () => {
             const res = await ServerFacade.getHintsForGame(game.id);
 
             if (res.ok) {
-                setHints(res.body.map((hint) => hint.hint + ' -- ' + hint.id));
+                setHints(res.body);
             } else {
                 setError(true);
             }
         };
         fetchHints();
-    }, []);
+    }, [game.id]);
 
-    return ( 
-        <div className="card mx-auto w-50 m-3">
-            <div className="card-body">
-                <h5 className="card-title">{game.name}</h5>
+    return (
+        <Card title={game.name}>
+            {error && <div>Error</div>}
+            {!error && !hints && <div>Loading...</div>}
 
-                {/* List of Hints */}
-                {error && <div>Error</div>}
-                {!error && !hints && <div>Loading...</div>}
-                {!error && hints && (
-                    <ul className="list-group mt-3">
-                    {hints.map((hint, index) => (
-                        <li className="list-group-item" key={index}>
-                            {hint}
-                        </li>
-                        ))}
-                    </ul>
-                )}
+            <List>
+                {hints.map((hint, index) => (
+                    <List.Item key={index}>
+                        <Typography.Text>{hint.hint}</Typography.Text>
+                        <Button
+                            type="link"
+                            onClick={() =>
+                                (window.location.href = `/hint/${hint.id}`)
+                            }
+                        >
+                            View Hint
+                        </Button>
+                    </List.Item>
+                ))}
+            </List>
 
-                {/* Add Hint Form */}
-                <div className="mt-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter hint description"
-                    value={newHint}
-                    onChange={(e) => setNewHint(e.target.value)}
-                />
-                <button
-                    className="btn btn-primary mt-2"
-                    onClick={() => addHint(game.id)}
-                    disabled={!newHint}
+            <Form form={form} onFinish={addHint}>
+                <Form.Item
+                    name="hint"
+                    label="Hint"
+                    rules={[{ required: true }]}
                 >
-                    Add Hint
-                </button>
-                </div>
-            </div>
-            </div>
-     );
-}
- 
+                    <Input />
+                </Form.Item>
+                <Form.Item>
+                    <Button
+                        type="primary"
+                        className="float-right"
+                        onClick={form.submit}
+                    >
+                        Add Hint
+                    </Button>
+                </Form.Item>
+            </Form>
+        </Card>
+    );
+};
+
 export default GameCard;
