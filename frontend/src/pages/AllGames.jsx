@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ServerFacade from "../serverFacade/ServerFacade";
-import { Button, Form, Input, List, Space, Typography } from "antd";
+import { Button, Card, Form, Input, Layout, List, Typography } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -42,57 +42,58 @@ const AllGames = () => {
     }, []);
 
     return (
-        <Space direction="vertical" size="middle" style={{ padding: "20px" }}>
+        <Layout style={{ padding: "20px", minHeight: "100vh" }}>
             <Typography.Title>All Games</Typography.Title>
+            <Card>
+                {error && <div>Error</div>}
+                {!error && !games && <div>Loading...</div>}
 
-            {error && <div>Error</div>}
-            {!error && !games && <div>Loading...</div>}
+                <List>
+                    {!error &&
+                        games &&
+                        games.map((game, index) => (
+                            <List.Item
+                                key={index}
+                                actions={[
+                                    <Button
+                                        onClick={() => deleteGame(game.id)}
+                                        icon={<DeleteOutlined />}
+                                        type="text"
+                                        danger
+                                    />,
+                                ]}
+                            >
+                                <List.Item.Meta
+                                    title={
+                                        <Link to={`/game/${game.id}`}>
+                                            {game.name}
+                                        </Link>
+                                    }
+                                />
+                            </List.Item>
+                        ))}
+                </List>
 
-            <List>
-                {!error &&
-                    games &&
-                    games.map((game, index) => (
-                        <List.Item
-                            key={index}
-                            actions={[
-                                <Button
-                                    onClick={() => deleteGame(game.id)}
-                                    icon={<DeleteOutlined />}
-                                    type="text"
-                                    danger
-                                />,
-                            ]}
-                        >
-                            <List.Item.Meta
-                                title={
-                                    <Link to={`/game/${game.id}`}>
-                                        {game.name}
-                                    </Link>
-                                }
-                            />
-                        </List.Item>
-                    ))}
-            </List>
-
-            <Form form={form} onFinish={addGame}>
-                <Form.Item
-                    name="name"
-                    label="Name"
-                    rules={[{ required: true }]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item>
-                    <Button
-                        type="primary"
-                        className="float-right"
-                        onClick={form.submit}
+                <Form form={form} onFinish={addGame}>
+                    <Form.Item
+                        name="name"
+                        label="Name"
+                        rules={[{ required: true }]}
                     >
-                        Add Game
-                    </Button>
-                </Form.Item>
-            </Form>
-        </Space>
+                        <Input />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            className="float-right"
+                            onClick={form.submit}
+                        >
+                            Add Game
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
+        </Layout>
     );
 };
 

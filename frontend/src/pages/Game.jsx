@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import ServerFacade from "../serverFacade/ServerFacade";
-import { Button, Form, Input, List, Space, Typography } from "antd";
+import { Button, Card, Form, Input, Layout, List, Typography } from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useParams } from "react-router-dom";
 import NotFound from "./404";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const Game = () => {
     const { id } = useParams();
@@ -23,6 +24,13 @@ const Game = () => {
         ]);
 
         form.resetFields();
+    }
+
+    async function deleteHint(id) {
+        const res = await ServerFacade.deleteHint(id);
+        if (res.ok) {
+            setHints(hints.filter((h) => h.id !== id));
+        }
     }
 
     useEffect(() => {
@@ -49,48 +57,57 @@ const Game = () => {
                     {!game ? (
                         <div>Loading...</div>
                     ) : (
-                        <Space direction="vertical" size="middle" style={{ padding: "20px" }}>
-                            <Typography.Title>
-                                {game.name}
-                            </Typography.Title>
-
-                            <List>
-                                {hints.map((hint, index) => (
-                                    <List.Item key={index}>
-                                        <Typography.Text>
-                                            {hint.hint}
-                                        </Typography.Text>
-                                        <Button
-                                            type="link"
-                                            onClick={() =>
-                                                (window.location.href = `/hint/${hint.id}`)
-                                            }
+                        <Layout style={{ padding: "20px", minHeight: "100vh" }}>
+                            <Typography.Title>{game.name}</Typography.Title>
+                            <Card>
+                                <List>
+                                    {hints.map((hint, index) => (
+                                        <List.Item
+                                            key={index}
+                                            actions={[
+                                                <Button
+                                                    type="link"
+                                                    onClick={() =>
+                                                        (window.location.href = `/hint/${hint.id}`)
+                                                    }
+                                                >
+                                                    View Hint
+                                                </Button>,
+                                                <Button
+                                                    onClick={() =>
+                                                        deleteHint(hint.id)
+                                                    }
+                                                    icon={<DeleteOutlined />}
+                                                    type="text"
+                                                    danger
+                                                />,
+                                            ]}
                                         >
-                                            View Hint
-                                        </Button>
-                                    </List.Item>
-                                ))}
-                            </List>
+                                            {hint.hint}
+                                        </List.Item>
+                                    ))}
+                                </List>
 
-                            <Form form={form} onFinish={addHint}>
-                                <Form.Item
-                                    name="hint"
-                                    label="Hint"
-                                    rules={[{ required: true }]}
-                                >
-                                    <Input />
-                                </Form.Item>
-                                <Form.Item>
-                                    <Button
-                                        type="primary"
-                                        className="float-right"
-                                        onClick={form.submit}
+                                <Form form={form} onFinish={addHint}>
+                                    <Form.Item
+                                        name="hint"
+                                        label="Hint"
+                                        rules={[{ required: true }]}
                                     >
-                                        Add Hint
-                                    </Button>
-                                </Form.Item>
-                            </Form>
-                        </Space>
+                                        <Input.TextArea />
+                                    </Form.Item>
+                                    <Form.Item>
+                                        <Button
+                                            type="primary"
+                                            className="float-right"
+                                            onClick={form.submit}
+                                        >
+                                            Add Hint
+                                        </Button>
+                                    </Form.Item>
+                                </Form>
+                            </Card>
+                        </Layout>
                     )}
                 </>
             )}

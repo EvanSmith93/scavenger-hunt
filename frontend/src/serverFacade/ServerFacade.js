@@ -19,8 +19,16 @@ class ServerFacade {
             .catch(err => console.log(err));
     }
 
-    static async getHintsForGame(gameid) {
-        return await fetch(`${SERVER_URL}/get-hints-for-game/${gameid}`)
+    static async getHintsForGame(gameId) {
+        return await fetch(`${SERVER_URL}/get-hints-for-game/${gameId}`)
+            .then(res => res.json())
+            .catch(err => console.log(err));
+    }
+
+    static async deleteHint(id) {
+        return await fetch(`${SERVER_URL}/delete-hint/${id}`, {
+            method: 'DELETE'
+        })
             .then(res => res.json())
             .catch(err => console.log(err));
     }

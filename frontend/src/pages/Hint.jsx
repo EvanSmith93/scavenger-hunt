@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import NotFound from "./404.jsx";
 import ServerFacade from "../serverFacade/ServerFacade.js";
-import { Space, Typography } from "antd";
+import { Card, Layout, Typography } from "antd";
 
 const Hint = () => {
     const { id } = useParams();
@@ -26,25 +26,23 @@ const Hint = () => {
             {error ? (
                 <NotFound />
             ) : (
-                <Space
-                    direction="vertical"
-                    size="middle"
-                    style={{ padding: "20px" }}
-                >
+                <Layout style={{ padding: "20px", minHeight: "100vh" }}>
                     <Typography.Title>You found a hint!</Typography.Title>
-                    {!data ? (
-                        <div>Loading...</div>
-                    ) : (
-                        <>
-                            <Typography.Title level={5}>
-                                Game ID: {data.id}
-                            </Typography.Title>
-                            <Typography.Title level={5}>
-                                Hint: {data.hint}
-                            </Typography.Title>
-                        </>
-                    )}
-                </Space>
+                    <Card>
+                        {!data ? (
+                            <div>Loading...</div>
+                        ) : (
+                            <>
+                                <Typography.Title level={5}>
+                                    Game ID: {data.id}
+                                </Typography.Title>
+                                <Typography.Title level={5}>
+                                    Hint: {data.hint}
+                                </Typography.Title>
+                            </>
+                        )}
+                    </Card>
+                </Layout>
             )}
         </>
     );

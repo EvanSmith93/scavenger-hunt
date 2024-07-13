@@ -84,10 +84,22 @@ app.get('/get-hints-for-game/:gameId', (req, res) => {
     });
 });
 
+// Delete a hint by ID from the database
+app.delete('/delete-hint/:id', (req, res) => {
+    db.run('DELETE FROM hint WHERE id = ?', [req.params.id], function (err) {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
+        } else {
+            res.status(200).send({ ok: true });
+        }
+    });
+});
+
 // Insert game into the database
 app.post('/add-game', (req, res) => {
     console.log('adding game: ' + req.body.name)
-    db.run('INSERT INTO game (name) VALUES (?)', [req.body.name], function(err) {
+    db.run('INSERT INTO game (name) VALUES (?)', [req.body.name], function (err) {
         if (err) {
             console.error(err.message);
             res.status(500).send({ ok: false, body: err });
@@ -125,13 +137,20 @@ app.get('/get-all-games', (req, res) => {
 
 // Delete a game by ID from the database
 app.delete('/delete-game/:id', (req, res) => {
-    db.run('DELETE FROM game WHERE id = ?', [req.params.id], function(err) {
-        if (err) {
-            console.error(err.message);
-            res.status(500).send({ ok: false, body: err });
-        } else {
+    db.serialize(() => {
+        db.run('DELETE FROM game WHERE id = ?', [req.params.id], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send({ ok: false, body: err });
+            }
+        });
+        db.run('DELETE FROM hint WHERE gameId = ?', [req.params.id], function (err) {
+            if (err) {
+                console.error(err.message);
+                res.status(500).send({ ok: false, body: err });
+            }
             res.status(200).send({ ok: true });
-        }
+        });
     });
 });
 

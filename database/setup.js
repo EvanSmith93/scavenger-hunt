@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-const sql = fs.readFileSync('database/schema.sql').toString();
+const sql = fs.readFileSync('./schema.sql').toString();
 
 const dbPath = path.join(__dirname, 'scavenger_hunt.db');
 const db = new sqlite3.Database(dbPath, (err) => {
