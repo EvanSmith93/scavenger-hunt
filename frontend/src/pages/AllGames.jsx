@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ServerFacade from "../serverFacade/ServerFacade";
-import GameCard from "./GameCard";
-import { Button, Flex, Form, Input, Layout, Space, Typography } from "antd";
+import { Button, Form, Input, List, Space, Typography } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 const AllGames = () => {
     const [games, setGames] = useState([]);
@@ -12,14 +13,19 @@ const AllGames = () => {
 
     async function addGame(values) {
         const newGameJson = { name: values.name };
-
         const response = await ServerFacade.addGame(newGameJson);
         setGames((prevGames) => [
             ...prevGames,
             { name: values.name, id: response.id },
         ]);
-
         form.resetFields();
+    }
+
+    async function deleteGame(id) {
+        const response = await ServerFacade.deleteGame(id);
+        if (response.ok) {
+            setGames(games.filter((g) => g.id !== id));
+        }
     }
 
     useEffect(() => {
@@ -42,13 +48,31 @@ const AllGames = () => {
             {error && <div>Error</div>}
             {!error && !games && <div>Loading...</div>}
 
-            <Flex wrap gap="middle">
+            <List>
                 {!error &&
                     games &&
                     games.map((game, index) => (
-                        <GameCard game={game} key={index} />
+                        <List.Item
+                            key={index}
+                            actions={[
+                                <Button
+                                    onClick={() => deleteGame(game.id)}
+                                    icon={<DeleteOutlined />}
+                                    type="text"
+                                    danger
+                                />,
+                            ]}
+                        >
+                            <List.Item.Meta
+                                title={
+                                    <Link to={`/game/${game.id}`}>
+                                        {game.name}
+                                    </Link>
+                                }
+                            />
+                        </List.Item>
                     ))}
-            </Flex>
+            </List>
 
             <Form form={form} onFinish={addGame}>
                 <Form.Item
@@ -68,32 +92,6 @@ const AllGames = () => {
                     </Button>
                 </Form.Item>
             </Form>
-
-            {/* <input
-                type="text"
-                className="form-control w-25 mx-auto"
-                placeholder="Enter game name"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-            />
-            <button
-                className="btn btn-primary mt-2"
-                onClick={() => addGame(newName)}
-                disabled={!newName}
-            >
-                Add Game
-            </button> */}
-
-            {/* <div className="container mt-5">
-                <h2>Add Game</h2>
-                <form id="addGameForm" className="mx-auto w-50" onSubmit={addGame}>
-                    <div className="form-group py-3">
-                    <label htmlFor="nameSubmit">Name</label>
-                    <input type="text" className="form-control form-control-md" id="nameSubmit" name="nameSubmit" value={newName} onChange={(e) => setNewName(e.target.value)} />
-                    </div>
-                    <button type="submit" className="btn btn-primary">Add Game</button>
-                </form>
-            </div> */}
         </Space>
     );
 };

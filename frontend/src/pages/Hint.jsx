@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import NotFound from "./404.jsx";
-import ServerFacade from "../serverFacade/ServerFacade";
+import ServerFacade from "../serverFacade/ServerFacade.js";
 import { Space, Typography } from "antd";
 
-const HintPage = () => {
+const Hint = () => {
     const { id } = useParams();
     const [data, setData] = useState(null);
     const [error, setError] = useState(false);
@@ -50,4 +50,4 @@ const HintPage = () => {
     );
 };
 
-export default HintPage;
+export default Hint;

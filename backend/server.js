@@ -72,18 +72,6 @@ app.get('/get-hint/:id', (req, res) => {
     });
 });
 
-// Retrieve all hints from the database
-app.get('/get-all-hints', (req, res) => {
-    db.all('SELECT * FROM hint', (err, rows) => {
-        if (err) {
-            console.error(err.message);
-            res.status(500).send({ok: false, body: err});
-        } else {
-            res.json({ok: true, body: rows});
-        }
-    });
-});
-
 // Retrieve all hints for a specific game
 app.get('/get-hints-for-game/:gameId', (req, res) => {
     db.all('SELECT * FROM hint WHERE gameId = ?', [req.params.gameId], (err, rows) => {
@@ -109,6 +97,20 @@ app.post('/add-game', (req, res) => {
     });
 });
 
+// Retrieve a game by ID from the database
+app.get('/get-game/:id', (req, res) => {
+    db.get('SELECT * FROM game WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
+        } else if (!row) {
+            res.status(404).send({ ok: false, body: 'Game not found' });
+        } else {
+            res.status(200).send({ ok: true, body: row });
+        }
+    });
+});
+
 // Retrieve all games from the database
 app.get('/get-all-games', (req, res) => {
     db.all('SELECT * FROM game', (err, rows) => {
@@ -117,6 +119,18 @@ app.get('/get-all-games', (req, res) => {
             res.status(500).send({ ok: false, body: err });
         } else {
             res.status(200).send({ ok: true, body: rows });
+        }
+    });
+});
+
+// Delete a game by ID from the database
+app.delete('/delete-game/:id', (req, res) => {
+    db.run('DELETE FROM game WHERE id = ?', [req.params.id], function(err) {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
+        } else {
+            res.status(200).send({ ok: true });
         }
     });
 });

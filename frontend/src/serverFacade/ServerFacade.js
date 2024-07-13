@@ -1,9 +1,7 @@
-// a sample server facade
-
 const SERVER_URL = 'http://localhost:3001';
 
 class ServerFacade {
-static async addHint(hint) {
+    static async addHint(hint) {
         return await fetch(`${SERVER_URL}/add-hint`, {
             method: 'POST',
             headers: {
@@ -17,12 +15,6 @@ static async addHint(hint) {
 
     static async getHint(id) {
         return await fetch(`${SERVER_URL}/get-hint/${id}`)
-            .then(res => res.json())
-            .catch(err => console.log(err));
-    }
-
-    static async getAllHints() {
-        return await fetch(`${SERVER_URL}/get-all-hints`)
             .then(res => res.json())
             .catch(err => console.log(err));
     }
@@ -45,8 +37,22 @@ static async addHint(hint) {
             .catch(err => console.log(err));
     }
 
+    static async getGame(id) {
+        return await fetch(`${SERVER_URL}/get-game/${id}`)
+            .then(res => res.json())
+            .catch(err => console.log(err));
+    }
+
     static async getAllGames() {
         return await fetch(`${SERVER_URL}/get-all-games`)
+            .then(res => res.json())
+            .catch(err => console.log(err));
+    }
+
+    static async deleteGame(id) {
+        return await fetch(`${SERVER_URL}/delete-game/${id}`, {
+            method: 'DELETE'
+        })
             .then(res => res.json())
             .catch(err => console.log(err));
     }
