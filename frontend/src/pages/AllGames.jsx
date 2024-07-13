@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import ServerFacade from "../serverFacade/ServerFacade";
 import { Button, Card, Form, Input, Layout, List, Typography } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
