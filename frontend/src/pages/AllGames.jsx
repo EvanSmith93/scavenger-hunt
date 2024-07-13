@@ -33,6 +33,7 @@ const AllGames = () => {
 
             if (res.ok) {
                 setGames(res.body);
+                console.log(res.body);
             } else {
                 setError(true);
             }
@@ -45,7 +46,6 @@ const AllGames = () => {
             <Typography.Title>All Games</Typography.Title>
             <Card>
                 {error && <div>Error</div>}
-                {!error && !games && <div>Loading...</div>}
 
                 <List>
                     {!error &&
@@ -68,6 +68,7 @@ const AllGames = () => {
                                             {game.name}
                                         </Link>
                                     }
+                                    description={`${game.hintCount} hints`}
                                 />
                             </List.Item>
                         ))}

@@ -54,61 +54,65 @@ const Game = () => {
                 <NotFound />
             ) : (
                 <>
-                    {!game ? (
-                        <div>Loading...</div>
-                    ) : (
-                        <Layout style={{ padding: "20px", minHeight: "100vh" }}>
-                            <Typography.Title>{game.name}</Typography.Title>
-                            <Card>
-                                <List>
-                                    {hints.map((hint, index) => (
-                                        <List.Item
-                                            key={index}
-                                            actions={[
-                                                <Button
-                                                    type="link"
-                                                    onClick={() =>
-                                                        (window.location.href = `/hint/${hint.id}`)
-                                                    }
-                                                >
-                                                    View Hint
-                                                </Button>,
-                                                <Button
-                                                    onClick={() =>
-                                                        deleteHint(hint.id)
-                                                    }
-                                                    icon={<DeleteOutlined />}
-                                                    type="text"
-                                                    danger
-                                                />,
-                                            ]}
-                                        >
-                                            {hint.hint}
-                                        </List.Item>
-                                    ))}
-                                </List>
+                    <Layout style={{ padding: "20px", minHeight: "100vh" }}>
+                        {!game ? (
+                            <div>Loading...</div>
+                        ) : (
+                            <>
+                                <Typography.Title>{game.name}</Typography.Title>
+                                <Card>
+                                    <List>
+                                        {hints.map((hint, index) => (
+                                            <List.Item
+                                                key={index}
+                                                actions={[
+                                                    <Button
+                                                        type="link"
+                                                        onClick={() =>
+                                                            (window.location.href = `/hint/${hint.id}`)
+                                                        }
+                                                    >
+                                                        View Hint
+                                                    </Button>,
+                                                    <Button
+                                                        onClick={() =>
+                                                            deleteHint(hint.id)
+                                                        }
+                                                        icon={
+                                                            <DeleteOutlined />
+                                                        }
+                                                        type="text"
+                                                        danger
+                                                    />,
+                                                ]}
+                                            >
+                                                {hint.hint}
+                                            </List.Item>
+                                        ))}
+                                    </List>
 
-                                <Form form={form} onFinish={addHint}>
-                                    <Form.Item
-                                        name="hint"
-                                        label="Hint"
-                                        rules={[{ required: true }]}
-                                    >
-                                        <Input.TextArea />
-                                    </Form.Item>
-                                    <Form.Item>
-                                        <Button
-                                            type="primary"
-                                            className="float-right"
-                                            onClick={form.submit}
+                                    <Form form={form} onFinish={addHint}>
+                                        <Form.Item
+                                            name="hint"
+                                            label="Hint"
+                                            rules={[{ required: true }]}
                                         >
-                                            Add Hint
-                                        </Button>
-                                    </Form.Item>
-                                </Form>
-                            </Card>
-                        </Layout>
-                    )}
+                                            <Input.TextArea />
+                                        </Form.Item>
+                                        <Form.Item>
+                                            <Button
+                                                type="primary"
+                                                className="float-right"
+                                                onClick={form.submit}
+                                            >
+                                                Add Hint
+                                            </Button>
+                                        </Form.Item>
+                                    </Form>
+                                </Card>
+                            </>
+                        )}
+                    </Layout>
                 </>
             )}
         </>

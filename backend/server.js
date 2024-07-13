@@ -84,6 +84,18 @@ app.get('/get-hints-for-game/:gameId', (req, res) => {
     });
 });
 
+// Retrieve the number of hints for a specific game
+app.get('/get-hint-count/:gameId', (req, res) => {
+    db.get('SELECT COUNT(*) AS count FROM hint WHERE gameId = ?', [req.params.gameId], (err, row) => {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send({ ok: false, body: err });
+        } else {
+            res.json({ ok: true, body: row.count });
+        }
+    });
+});
+
 // Delete a hint by ID from the database
 app.delete('/delete-hint/:id', (req, res) => {
     db.run('DELETE FROM hint WHERE id = ?', [req.params.id], function (err) {
@@ -125,7 +137,7 @@ app.get('/get-game/:id', (req, res) => {
 
 // Retrieve all games from the database
 app.get('/get-all-games', (req, res) => {
-    db.all('SELECT * FROM game', (err, rows) => {
+    db.all('SELECT game.*, COUNT(hint.id) AS hintCount FROM game LEFT JOIN hint ON game.id = hint.gameId GROUP BY game.id', (err, rows) => {
         if (err) {
             console.error(err.message);
             res.status(500).send({ ok: false, body: err });

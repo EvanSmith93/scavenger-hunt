@@ -25,6 +25,12 @@ class ServerFacade {
             .catch(err => console.log(err));
     }
 
+    static async getHintCount(gameId) {
+        return await fetch(`${SERVER_URL}/get-hint-count/${gameId}`)
+            .then(res => res.json())
+            .catch(err => console.log(err));
+    }
+
     static async deleteHint(id) {
         return await fetch(`${SERVER_URL}/delete-hint/${id}`, {
             method: 'DELETE'
