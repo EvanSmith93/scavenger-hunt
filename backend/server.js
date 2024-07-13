@@ -61,9 +61,11 @@ app.post('/add-hint', (req, res) => {
 app.get('/get-hint/:id', (req, res) => {
     console.log('getting one hint: ' + req.params.id)
     db.get('SELECT * FROM hint WHERE id = ?', [req.params.id], (err, row) => {
-        if (err || row === undefined) {
+        if (err) {
             console.error(err.message);
             res.status(500).send({ ok: false, body: err });
+        } else if (!row) {
+            res.status(404).send({ ok: false, body: 'Hint not found' });
         } else {
             res.json({ ok: true, body: row })
         }
