@@ -9,16 +9,16 @@ import NotFound from "./pages/404.jsx";
 import Game from "./pages/Game.jsx";
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<AllGames />}></Route>
-                <Route path="/game/:id" element={<Game />} />
-                <Route path="/hint/:id" element={<Hint />} />
-                <Route path="*" element={<NotFound />}></Route>
-            </Routes>
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<AllGames />}></Route>
+        <Route path="/game/:id" element={<Game />} />
+        <Route path="/hint/:id" element={<Hint />} />
+        <Route path="*" element={<NotFound />}></Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
