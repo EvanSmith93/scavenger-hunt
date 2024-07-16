@@ -15,6 +15,13 @@ const Game = () => {
 
   const [form] = useForm();
 
+  async function updateGame(game) {
+    const res = await ServerFacade.updateGame(game);
+    if (res.ok) {
+      setGame(game);
+    }
+  }
+
   async function addHint(values) {
     const newHintJson = { hint: values.hint, gameId: id };
     const res = await ServerFacade.addHint(newHintJson);
@@ -24,6 +31,13 @@ const Game = () => {
     ]);
 
     form.resetFields();
+  }
+
+  async function updateHint(hint) {
+    const res = await ServerFacade.updateHint(hint);
+    if (res.ok) {
+      setHints([...hints.filter((h) => h.id !== hint.id), hint]);
+    }
   }
 
   async function deleteHint(id) {
@@ -59,7 +73,14 @@ const Game = () => {
               <div>Loading...</div>
             ) : (
               <>
-                <Typography.Title>{game.name}</Typography.Title>
+                <Typography.Title
+                  editable={{
+                    onChange: (e) => updateGame({ ...game, name: e }),
+                  }}
+                  level={2}
+                >
+                  {game.name}
+                </Typography.Title>
                 <Card>
                   <List>
                     {hints.map((hint, index) => (
@@ -82,7 +103,19 @@ const Game = () => {
                           />,
                         ]}
                       >
-                        {hint.hint}
+                        <List.Item.Meta
+                          title={`Hint ${index + 1}`} // todo: add an optional title field and display it here
+                          description={
+                            <Typography.Text
+                              editable={{
+                                onChange: (e) =>
+                                  updateHint({ ...hint, hint: e }),
+                              }}
+                            >
+                              {hint.hint}
+                            </Typography.Text>
+                          }
+                        />
                       </List.Item>
                     ))}
                   </List>

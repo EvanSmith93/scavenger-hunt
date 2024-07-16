@@ -111,6 +111,22 @@ app.get("/get-hint-count/:gameId", (req, res) => {
   );
 });
 
+// Update a hint by ID in the database
+app.put("/update-hint", (req, res) => {
+  db.run(
+    "UPDATE hint SET hint = ? WHERE id = ?",
+    [req.body.hint, req.body.id],
+    function (err) {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send({ ok: false, body: err });
+      } else {
+        res.status(200).send({ ok: true });
+      }
+    }
+  );
+});
+
 // Delete a hint by ID from the database
 app.delete("/delete-hint/:id", (req, res) => {
   db.run("DELETE FROM hint WHERE id = ?", [req.params.id], function (err) {
@@ -160,6 +176,22 @@ app.get("/get-all-games", (req, res) => {
         res.status(500).send({ ok: false, body: err });
       } else {
         res.status(200).send({ ok: true, body: rows });
+      }
+    }
+  );
+});
+
+// Update a game by ID in the database
+app.put("/update-game", (req, res) => {
+  db.run(
+    "UPDATE game SET name = ? WHERE id = ?",
+    [req.body.name, req.body.id],
+    function (err) {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send({ ok: false, body: err });
+      } else {
+        res.status(200).send({ ok: true });
       }
     }
   );
