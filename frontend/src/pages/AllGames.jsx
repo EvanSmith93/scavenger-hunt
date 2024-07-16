@@ -4,7 +4,7 @@ import { Button, Card, Form, Input, Layout, List, Typography } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
-const AllGames = () => {
+export default function AllGames() {
   const [games, setGames] = useState([]);
   const [error, setError] = useState(false);
 
@@ -87,6 +87,4 @@ const AllGames = () => {
       </Card>
     </Layout>
   );
-};
-
-export default AllGames;
+}

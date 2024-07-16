@@ -6,7 +6,7 @@ import { Card, Layout, Space, Typography } from "antd";
 import Cookies from "js-cookie";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
-const Hint = () => {
+export default function Hint() {
   const { id } = useParams();
   const [hint, setHint] = useState(null);
   const [hintCount, setHintCount] = useState(null);
@@ -76,9 +76,7 @@ const Hint = () => {
                 <Typography.Title level={5}>
                   Game ID: {hint.gameId}
                 </Typography.Title>
-                <Typography.Title level={5}>
-                  Name: {hint.name}
-                </Typography.Title>
+                <Typography.Title level={5}>Name: {hint.name}</Typography.Title>
                 <Typography.Title level={5}>
                   Description: {hint.description}
                 </Typography.Title>
@@ -89,6 +87,4 @@ const Hint = () => {
       )}
     </>
   );
-};
-
-export default Hint;
+}

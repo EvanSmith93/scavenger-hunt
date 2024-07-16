@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import NotFound from "./404";
 import { DeleteOutlined } from "@ant-design/icons";
 
-const Game = () => {
+export default function Game() {
   const { id } = useParams();
 
   const [game, setGame] = useState(null);
@@ -150,6 +150,4 @@ const Game = () => {
       )}
     </>
   );
-};
-
-export default Game;
+}

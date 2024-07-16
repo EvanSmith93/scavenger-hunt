@@ -8,7 +8,7 @@ import AllGames from "./pages/AllGames.jsx";
 import NotFound from "./pages/404.jsx";
 import Game from "./pages/Game.jsx";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -20,5 +20,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

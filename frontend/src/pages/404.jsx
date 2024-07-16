@@ -1,7 +1,7 @@
 import { Result } from "antd";
 import React from "react";
 
-const NotFound = () => {
+export default function NotFound() {
   return (
     <Result
       status="404"
@@ -9,6 +9,4 @@ const NotFound = () => {
       subTitle="Sorry, the page you visited does not exist."
     />
   );
-};
-
-export default NotFound;
+}
