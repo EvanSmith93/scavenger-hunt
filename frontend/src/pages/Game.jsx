@@ -1,19 +1,32 @@
 import React, { useState, useEffect } from "react";
 import ServerFacade from "../serverFacade/ServerFacade";
-import { Button, Card, Form, Input, Layout, List, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  Layout,
+  List,
+  Modal,
+  Typography,
+} from "antd";
 import { useForm } from "antd/es/form/Form";
 import { useParams } from "react-router-dom";
 import NotFound from "./404";
-import { DeleteOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExportOutlined,
+} from "@ant-design/icons";
 
 export default function Game() {
   const { id } = useParams();
 
+  const [editModal, setEditModal] = useState({ open: false });
+
   const [game, setGame] = useState(null);
   const [hints, setHints] = useState([]);
   const [error, setError] = useState(false);
-
-  const [form] = useForm();
 
   async function updateGame(game) {
     const res = await ServerFacade.updateGame(game);
@@ -30,8 +43,6 @@ export default function Game() {
     };
     const res = await ServerFacade.addHint(newHintJson);
     setHints((prevHints) => [...prevHints, { ...newHintJson, id: res.id }]);
-
-    form.resetFields();
   }
 
   async function updateHint(hint) {
@@ -90,16 +101,20 @@ export default function Game() {
                         actions={[
                           <Button
                             type="link"
+                            icon={<ExportOutlined />}
                             onClick={() =>
                               (window.location.href = `/hint/${hint.id}`)
                             }
-                          >
-                            View Hint
-                          </Button>,
+                          />,
                           <Button
-                            onClick={() => deleteHint(hint.id)}
-                            icon={<DeleteOutlined />}
+                            type="link"
+                            icon={<EditOutlined />}
+                            onClick={() => setEditModal({ hint, open: true })}
+                          />,
+                          <Button
                             type="text"
+                            icon={<DeleteOutlined />}
+                            onClick={() => deleteHint(hint.id)}
                             danger
                           />,
                         ]}
@@ -107,12 +122,7 @@ export default function Game() {
                         <List.Item.Meta
                           title={hint.name || undefined}
                           description={
-                            <Typography.Text
-                              editable={{
-                                onChange: (e) =>
-                                  updateHint({ ...hint, description: e }),
-                              }}
-                            >
+                            <Typography.Text>
                               {hint.description}
                             </Typography.Text>
                           }
@@ -120,34 +130,67 @@ export default function Game() {
                       </List.Item>
                     ))}
                   </List>
-
-                  <Form form={form} onFinish={addHint}>
-                    <Form.Item name="name" label="Name">
-                      <Input />
-                    </Form.Item>
-                    <Form.Item
-                      name="description"
-                      label="Description"
-                      rules={[{ required: true }]}
-                    >
-                      <Input.TextArea />
-                    </Form.Item>
-                    <Form.Item>
-                      <Button
-                        type="primary"
-                        className="float-right"
-                        onClick={form.submit}
-                      >
-                        Add Hint
-                      </Button>
-                    </Form.Item>
-                  </Form>
+                  <Button
+                    type="primary"
+                    style={{ marginTop: "8px" }}
+                    onClick={() => setEditModal({ open: true })}
+                  >
+                    Add Hint
+                  </Button>
                 </Card>
               </>
             )}
           </Layout>
+          <HintModal
+            open={editModal.open}
+            hint={editModal.hint}
+            setOpen={(open) => setEditModal({ open })}
+            onOk={(values) =>
+              values.id ? updateHint(values) : addHint(values)
+            }
+          />
         </>
       )}
     </>
+  );
+}
+
+export function HintModal({ hint, open, setOpen, onOk }) {
+  const [form] = useForm();
+
+  return (
+    <Modal
+      open={open}
+      onCancel={() => setOpen(false)}
+      onOk={form.submit}
+      title={`${hint ? "Edit" : "Add"} Hint`}
+      destroyOnClose
+    >
+      <Form
+        labelCol={{ span: 6 }}
+        form={form}
+        initialValues={{
+          name: hint?.name,
+          description: hint?.description,
+        }}
+        preserve={false}
+        onFinish={() => {
+          onOk({ id: hint?.id, ...form.getFieldsValue() });
+          setOpen(false);
+          form.resetFields();
+        }}
+      >
+        <Form.Item name="name" label="Name">
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="description"
+          label="Description"
+          rules={[{ required: true }]}
+        >
+          <Input.TextArea rows={3} />
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 }

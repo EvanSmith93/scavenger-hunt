@@ -77,7 +77,7 @@ export default function AllGames() {
           <Form.Item>
             <Button
               type="primary"
-              className="float-right"
+              style={{ float: "right" }}
               onClick={form.submit}
             >
               Add Game
