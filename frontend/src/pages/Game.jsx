@@ -23,12 +23,13 @@ const Game = () => {
   }
 
   async function addHint(values) {
-    const newHintJson = { hint: values.hint, gameId: id };
+    const newHintJson = {
+      name: values.name,
+      description: values.description,
+      gameId: id,
+    };
     const res = await ServerFacade.addHint(newHintJson);
-    setHints((prevHints) => [
-      ...prevHints,
-      { hint: values.hint, id: res.body },
-    ]);
+    setHints((prevHints) => [...prevHints, { ...newHintJson, id: res.id }]);
 
     form.resetFields();
   }
@@ -36,7 +37,7 @@ const Game = () => {
   async function updateHint(hint) {
     const res = await ServerFacade.updateHint(hint);
     if (res.ok) {
-      setHints([...hints.filter((h) => h.id !== hint.id), hint]);
+      setHints(hints.map((h) => (h.id === hint.id ? hint : h)));
     }
   }
 
@@ -104,15 +105,15 @@ const Game = () => {
                         ]}
                       >
                         <List.Item.Meta
-                          title={`Hint ${index + 1}`} // todo: add an optional title field and display it here
+                          title={hint.name || undefined}
                           description={
                             <Typography.Text
                               editable={{
                                 onChange: (e) =>
-                                  updateHint({ ...hint, hint: e }),
+                                  updateHint({ ...hint, description: e }),
                               }}
                             >
-                              {hint.hint}
+                              {hint.description}
                             </Typography.Text>
                           }
                         />
@@ -121,9 +122,12 @@ const Game = () => {
                   </List>
 
                   <Form form={form} onFinish={addHint}>
+                    <Form.Item name="name" label="Name">
+                      <Input />
+                    </Form.Item>
                     <Form.Item
-                      name="hint"
-                      label="Hint"
+                      name="description"
+                      label="Description"
                       rules={[{ required: true }]}
                     >
                       <Input.TextArea />

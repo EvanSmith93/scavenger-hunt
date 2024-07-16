@@ -76,7 +76,12 @@ const Hint = () => {
                 <Typography.Title level={5}>
                   Game ID: {hint.gameId}
                 </Typography.Title>
-                <Typography.Title level={5}>Hint: {hint.hint}</Typography.Title>
+                <Typography.Title level={5}>
+                  Name: {hint.name}
+                </Typography.Title>
+                <Typography.Title level={5}>
+                  Description: {hint.description}
+                </Typography.Title>
               </>
             )}
           </Card>

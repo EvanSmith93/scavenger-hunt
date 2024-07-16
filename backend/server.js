@@ -40,8 +40,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
 app.post("/add-hint", (req, res) => {
   db.serialize(() => {
     db.run(
-      "INSERT INTO hint (hint, gameid) VALUES (?, ?)",
-      [req.body.hint, req.body.gameId],
+      "INSERT INTO hint (name, description, gameid) VALUES (?, ?, ?)",
+      [req.body.name, req.body.description, req.body.gameId],
       function (err) {
         if (err) {
           console.error(err.message);
@@ -114,8 +114,8 @@ app.get("/get-hint-count/:gameId", (req, res) => {
 // Update a hint by ID in the database
 app.put("/update-hint", (req, res) => {
   db.run(
-    "UPDATE hint SET hint = ? WHERE id = ?",
-    [req.body.hint, req.body.id],
+    "UPDATE hint SET name = ?, description = ? WHERE id = ?",
+    [req.body.name, req.body.description, req.body.id],
     function (err) {
       if (err) {
         console.error(err.message);
