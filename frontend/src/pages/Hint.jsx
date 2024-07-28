@@ -8,6 +8,7 @@ import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
 export default function Hint() {
   const { id } = useParams();
+  const [game, setGame] = useState(null);
   const [hint, setHint] = useState(null);
   const [hintCount, setHintCount] = useState(null);
   const [hintsFound, setHintsFound] = useState([]);
@@ -32,14 +33,17 @@ export default function Hint() {
         return;
       }
 
+      const game = await ServerFacade.getGame(hint.body.gameId);
+      if (!game.ok) {
+        setError(true);
+        return;
+      }
+
       const count = await ServerFacade.getHintCount(hint.body.gameId);
       if (!count.ok) {
         setError(true);
         return;
       }
-
-      setHint(hint.body);
-      setHintCount(count.body);
 
       const foundHints = getCookies(hint.body.gameId);
       const validHints = await ServerFacade.validateHints(
@@ -50,6 +54,10 @@ export default function Hint() {
         setError(true);
         return;
       }
+
+      setHint(hint.body);
+      setGame(game.body);
+      setHintCount(count.body);
       setHintsFound(validHints.body);
     }
     fetch();
@@ -82,14 +90,12 @@ export default function Hint() {
               <div>Loading...</div>
             ) : (
               <>
-                <Space style={{ fontSize: "30px" }}>{icons}</Space>
-                <Typography.Title level={5}>
-                  Game ID: {hint.gameId}
-                </Typography.Title>
-                <Typography.Title level={5}>Name: {hint.name}</Typography.Title>
-                <Typography.Title level={5}>
-                  Description: {hint.description}
-                </Typography.Title>
+                <Space style={{ fontSize: "32px" }}>{icons}</Space>
+                <Typography.Title level={3}>{game.name}</Typography.Title>
+                <Typography.Text strong>{hint.name}</Typography.Text>
+                <Typography.Paragraph type="secondary">
+                  {hint.description}
+                </Typography.Paragraph>
               </>
             )}
           </Card>
