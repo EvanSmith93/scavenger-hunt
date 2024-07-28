@@ -8,6 +8,8 @@ import AllGames from "./pages/AllGames.jsx";
 import NotFound from "./pages/404.jsx";
 import Game from "./pages/Game.jsx";
 
+export const BASE_URL = "http://localhost:3000";
+
 export default function App() {
   return (
     <BrowserRouter>

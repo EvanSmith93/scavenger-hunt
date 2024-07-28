@@ -8,6 +8,8 @@ import {
   Layout,
   List,
   Modal,
+  QRCode,
+  Tooltip,
   Typography,
 } from "antd";
 import { useForm } from "antd/es/form/Form";
@@ -18,6 +20,7 @@ import {
   EditOutlined,
   ExportOutlined,
 } from "@ant-design/icons";
+import { BASE_URL } from "../App";
 
 export default function Game() {
   const { id } = useParams();
@@ -59,6 +62,21 @@ export default function Game() {
     }
   }
 
+  function getDownloadFunc(name) {
+    return () => {
+      const canvas = document.getElementById(name)?.querySelector("canvas");
+      if (canvas) {
+        const url = canvas.toDataURL();
+        const a = document.createElement("a");
+        a.download = `${name}.png`;
+        a.href = url;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    };
+  }
+
   useEffect(() => {
     async function fetch() {
       const gameRes = await ServerFacade.getGame(id);
@@ -95,40 +113,54 @@ export default function Game() {
                 </Typography.Title>
                 <Card>
                   <List>
-                    {hints.map((hint, index) => (
-                      <List.Item
-                        key={index}
-                        actions={[
-                          <Button
-                            type="link"
-                            icon={<ExportOutlined />}
-                            onClick={() =>
-                              (window.location.href = `/hint/${hint.id}`)
+                    {hints.map((hint, index) => {
+                      const qrCodeName = `QR Code ${index + 1}`;
+                      return (
+                        <List.Item
+                          key={index}
+                          actions={[
+                            <Button
+                              type="link"
+                              icon={<ExportOutlined />}
+                              onClick={() =>
+                                (window.location.href = `/hint/${hint.id}`)
+                              }
+                            />,
+                            <Button
+                              type="link"
+                              icon={<EditOutlined />}
+                              onClick={() => setEditModal({ hint, open: true })}
+                            />,
+                            <Button
+                              type="text"
+                              icon={<DeleteOutlined />}
+                              onClick={() => deleteHint(hint.id)}
+                              danger
+                            />,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={hint.name || undefined}
+                            description={
+                              <Typography.Text>
+                                {hint.description}
+                              </Typography.Text>
                             }
-                          />,
-                          <Button
-                            type="link"
-                            icon={<EditOutlined />}
-                            onClick={() => setEditModal({ hint, open: true })}
-                          />,
-                          <Button
-                            type="text"
-                            icon={<DeleteOutlined />}
-                            onClick={() => deleteHint(hint.id)}
-                            danger
-                          />,
-                        ]}
-                      >
-                        <List.Item.Meta
-                          title={hint.name || undefined}
-                          description={
-                            <Typography.Text>
-                              {hint.description}
-                            </Typography.Text>
-                          }
-                        />
-                      </List.Item>
-                    ))}
+                          />
+                          <Tooltip title="Download QR Code">
+                            <QRCode
+                              id={qrCodeName}
+                              value={`${BASE_URL}/hint/${hint.id}`}
+                              icon="http://localhost:3000/favicon.ico"
+                              bgColor="#fff"
+                              size={120}
+                              onClick={getDownloadFunc(qrCodeName)}
+                              style={{ cursor: "pointer" }}
+                            />
+                          </Tooltip>
+                        </List.Item>
+                      );
+                    })}
                   </List>
                   <Button
                     type="primary"
