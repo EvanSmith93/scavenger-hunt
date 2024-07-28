@@ -42,7 +42,7 @@ export default function Game() {
       gameId: id,
     };
     const res = await ServerFacade.addHint(newHintJson);
-    setHints((prevHints) => [...prevHints, { ...newHintJson, id: res.id }]);
+    setHints((prevHints) => [...prevHints, { ...newHintJson, id: res.body }]);
   }
 
   async function updateHint(hint) {

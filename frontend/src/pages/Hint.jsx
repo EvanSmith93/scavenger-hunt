@@ -15,32 +15,42 @@ export default function Hint() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    function handleCookies(gameId) {
+    function getCookies(gameId) {
       let found = JSON.parse(Cookies.get(`hints-game-${gameId}`) || "[]");
       if (!found.includes(id)) {
         found.push(id);
         Cookies.set(`hints-game-${gameId}`, JSON.stringify(found));
         setIsNewHint(true);
       }
-      setHintsFound(found);
+      return found;
     }
 
     async function fetch() {
-      const hintRes = await ServerFacade.getHint(id);
-
-      if (hintRes.ok) {
-        const countRes = await ServerFacade.getHintCount(hintRes.body.gameId);
-
-        if (countRes.ok) {
-          setHint(hintRes.body);
-          setHintCount(countRes.body);
-          handleCookies(hintRes.body.gameId);
-        } else {
-          setError(true);
-        }
-      } else {
+      const hint = await ServerFacade.getHint(id);
+      if (!hint.ok) {
         setError(true);
+        return;
       }
+
+      const count = await ServerFacade.getHintCount(hint.body.gameId);
+      if (!count.ok) {
+        setError(true);
+        return;
+      }
+
+      setHint(hint.body);
+      setHintCount(count.body);
+
+      const foundHints = getCookies(hint.body.gameId);
+      const validHints = await ServerFacade.validateHints(
+        hint.body.gameId,
+        foundHints
+      );
+      if (!validHints.ok) {
+        setError(true);
+        return;
+      }
+      setHintsFound(validHints.body);
     }
     fetch();
   }, [id]);

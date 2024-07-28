@@ -111,6 +111,27 @@ app.get("/get-hint-count/:gameId", (req, res) => {
   );
 });
 
+// Validate hints for a specific game (returns the list of valid hints)
+app.post("/validate-hints/:gameId", (req, res) => {
+  console.log('validate-hints');
+  db.all(
+    "SELECT id FROM hint WHERE gameId = ?",
+    [req.params.gameId],
+    (err, rows) => {
+      if (err) {
+        console.error(err.message);
+        res.status(500).send({ ok: false, body: err });
+      } else {
+        console.log(req);
+        const validRows = req.body.hintsFound.filter((hintId) =>
+          rows.some((row) => row.id == hintId)
+        );
+        res.json({ ok: true, body: validRows });
+      }
+    }
+  );
+});
+
 // Update a hint by ID in the database
 app.put("/update-hint", (req, res) => {
   db.run(

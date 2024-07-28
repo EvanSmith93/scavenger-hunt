@@ -31,6 +31,18 @@ class ServerFacade {
       .catch((err) => console.log(err));
   }
 
+  static async validateHints(gameId, hintsFound) {
+    return await fetch(`${SERVER_URL}/validate-hints/${gameId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ hintsFound }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log(err));
+  }
+
   static async updateHint(hint) {
     return await fetch(`${SERVER_URL}/update-hint`, {
       method: "PUT",
