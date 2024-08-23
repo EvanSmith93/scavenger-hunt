@@ -151,7 +151,7 @@ export default function Game() {
                             <QRCode
                               id={qrCodeName}
                               value={`${BASE_URL}/hint/${hint.id}`}
-                              icon="http://localhost:3000/favicon.ico"
+                              icon={`${BASE_URL}/favicon.ico`}
                               bgColor="#fff"
                               size={120}
                               onClick={getDownloadFunc(qrCodeName)}
